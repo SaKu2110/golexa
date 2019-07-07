@@ -1,2 +1,2 @@
 # golaxa
-A Go framework for interacting with Amazon Alexa.
+A Go package for interacting with Amazon Alexa.
