@@ -1,9 +1,5 @@
 package golexa
 
-import(
-	"time"
-)
-
 type request struct {
 	Request struct {
 		Type                       string    `json:"type"`
