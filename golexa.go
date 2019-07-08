@@ -6,10 +6,10 @@ import(
 )
 
 type alexa struct{
-	FUNC	func(string)string
+	FUNC	func(string, string)string
 }
 
-func Default(f func(string)string) *alexa{
+func Default(f func(string, string)string) *alexa{
 	init := &alexa{FUNC: f}
 	return init
 }
@@ -22,7 +22,7 @@ func (alexa *alexa)CallHandler(g *gin.Context){
 	if request_type == "IntentRequest" {
 		request_type = req.Request.Intent.Name
 	}
-	json := alexa.FUNC(request_type)
+	json := alexa.FUNC(request_type, req.Request.Intent.Slots.Slot.Value)
 	g.JSON(200, json)
 }
 
