@@ -8,7 +8,7 @@ type request struct {
 			Slots struct {
 				Slot struct {
 					Value	string	`json: value`
-				}	`json: myname`
+				}	`json: slot`
 			}	`json: slots`
 		} `json: Intent`
 	} `json:"request"`
