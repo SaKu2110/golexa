@@ -5,28 +5,24 @@ import(
 	"encoding/json"
 )
 
-type alexa struct{
-	FUNC	func(string, string)string
+type golexa struct{
+	// Handle intents
+	Intent	func(*Context)
 }
 
-func Default(f func(string, string)string) *alexa{
-	init := &alexa{FUNC: f}
-	return init
+type Context struct{
+	gin		*gin.Context
+	slotExist	bool
+	slots		interface{}
+	Intent		string
 }
 
-func (alexa *alexa)CallHandler(g *gin.Context){
-	var request_type string
-	req := request{}
-	g.BindJSON(&req)
-	request_type = req.Request.Type
-	if request_type == "IntentRequest" {
-		request_type = req.Request.Intent.Name
-	}
-	json := alexa.FUNC(request_type, req.Request.Intent.Slots.Slot.Value)
-	g.JSON(200, json)
+func (c *Context) Slots(s string)(string){
+	value := c.slots.(map[string]interface{})[s].(map[string]interface{})["value"].(string)
+	return value
 }
 
-func Ask(msg string) string{
+func (c *Context) Ask(msg string){
 	res := response{}
 
 	// データ入力
@@ -37,12 +33,12 @@ func Ask(msg string) string{
         res.Response.Type = "_DEFAULT_RESPONSE"
 
         byte_code, _ := json.Marshal(res)
-        json := string(byte_code)
+	json := string(byte_code)
 
-	return json
+	c.gin.JSON(200, json)
 }
 
-func Tell(msg string) string{
+func (c *Context) Tell(msg string){
 	res := response{}
 
 	// データ入力
@@ -53,8 +49,31 @@ func Tell(msg string) string{
         res.Response.Type = "_DEFAULT_RESPONSE"
 
         byte_code, _ := json.Marshal(res)
-        json := string(byte_code)
+	json := string(byte_code)
 
+	c.gin.JSON(200, json)
+}
 
-	return json
+func Default() *golexa{
+	init := &golexa{}
+	return init
+}
+
+func (golexa *golexa) SetIntent(f func(*Context)){
+	golexa.Intent = f
+}
+
+func (golexa *golexa)Handler(g *gin.Context){
+	context := Context{}
+	request := request{}
+
+	g.BindJSON(&request)
+	context.slots = request.Request.Intent.Slots
+	context.Intent = request.Request.Type
+	if context.Intent == "IntentRequest" {
+		context.Intent = request.Request.Intent.Name
+	}
+
+	context.gin = g
+	golexa.Intent(&context)
 }
