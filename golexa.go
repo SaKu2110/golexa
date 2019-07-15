@@ -63,13 +63,13 @@ func (golexa *golexa) SetIntent(f func(*Context)){
 
 func (golexa *golexa)Handler(g *gin.Context){
 	context := Context{}
-	request := request{}
+	var request interface{}
 
 	g.BindJSON(&request)
-	context.slots = request.Request
-	context.Intent = request.Request.(map[string]interface{})["type"].(string)
+	context.slots = request.(map[string]interface{})["request"].(interface{})
+	context.Intent = request.(map[string]interface{})["request"].(map[string]interface{})["type"].(string)
 	if context.Intent == "IntentRequest" {
-		context.Intent = request.Request.(map[string]interface{})["intent"].(map[string]interface{})["name"].(string)
+		context.Intent = request.(map[string]interface{})["request"].(map[string]interface{})["intent"].(map[string]interface{})["name"].(string)
 	}
 
 	context.gin = g
