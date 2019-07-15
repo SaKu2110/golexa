@@ -12,14 +12,12 @@ type golexa struct{
 
 type Context struct{
 	gin		*gin.Context
-	slotExist	bool
 	slots		interface{}
 	Intent		string
 }
 
 func (c *Context) Slots(s string)(string){
-	value := c.slots.(map[string]interface{})[s].(map[string]interface{})["value"].(string)
-	return value
+	return c.slots.(map[string]interface{})[s].(map[string]interface{})["value"].(string)
 }
 
 func (c *Context) Ask(msg string){
@@ -68,10 +66,10 @@ func (golexa *golexa)Handler(g *gin.Context){
 	request := request{}
 
 	g.BindJSON(&request)
-	context.slots = request.Request.Intent.Slots
-	context.Intent = request.Request.Type
+	context.slots = request.Request
+	context.Intent = request.Request.(map[string]interface{})["type"].(string)
 	if context.Intent == "IntentRequest" {
-		context.Intent = request.Request.Intent.Name
+		context.Intent = request.Request.(map[string]interface{})["intent"].(map[string]interface{})["name"].(string)
 	}
 
 	context.gin = g
