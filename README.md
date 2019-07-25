@@ -1,4 +1,4 @@
-# Golaxa
+# Golexa
 A Go package for interacting with Amazon Alexa.  
 Designed to work with Gin.
 
