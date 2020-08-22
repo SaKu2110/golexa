@@ -1,69 +1,67 @@
 package golexa
 
-type Request struct {
-	Version	string	`json:"version"`
-	Session	session	`json:"session"`
-	Context	context `json:"context"`
-	Request	request	`json:"request"`
+type RequestBody struct {
+	Version	string		`json:"version"`
+	Session	Session		`json:"session,omitempty"`
+	Context	Status		`json:"context"`
+	Request	struct {
+		Type	string	`json:"type"`
+		Intent	Intent	`json:"intent,omitempty"`
+	}	`json:"request"`
 }
 
-type session struct {
+type Session struct {
 	New			bool					`json:"new"`
 	SessionId	string					`json:"sessionId"`
 	Attributes	map[string]interface{}	`json:"attributes"`
-	Application	application				`json:"application"`
-	User		user					`json:"user"`
+	Application	Application				`json:"application"`
+	User		User					`json:"user"`
 }
 
-type application struct {
-	ApplicationId	string	`json:"applicationId"`
+type Status struct {
+	System		System		`json:"System"`
+	AudioPlayer	AudioPlayer	`json:"AudioPlayer"`
 }
 
-type user struct {
-	UserId		string	`json:"userId"`
-	AccessToken	string	`json:"accessToken"`
+type Application struct {
+	Id	string	`json:"applicationId"`
 }
 
-type context struct {
-	System		system		`json:"System"`
-	AudioPlayer	audioPlayer	`json:"AudioPlayer"`
+type User struct {
+	Id		string	`json:"userId"`
+	Token	string	`json:"accessToken"`
 }
 
-type system struct {
+type System struct {
 	ApiAccessToken	string		`json:"apiAccessToken"`
 	ApiEndpoint		string		`json:"apiEndpoint"`
-	Application		application	`json:"application"`
-	Device			device		`json:"device"`
-	Person			person		`json:"person"`
-	User			user		`json:"user"`
+	Application		Application	`json:"application"`
+	Device			Device		`json:"device"`
+	Person			Person		`json:"person"`
+	User			User		`json:"user"`
 }
 
-type device struct {
-	DeviceId	string	`json:"deviceId"`
+type Device struct {
+	Id	string	`json:"deviceId"`
 }
 
-type person struct {
-	PersonId	string	`json:"deviceId"`
+type Person struct {
+	Id	string			`json:"personId"`
 	AccessToken	string	`json:"accessToken"`
 }
 
-type audioPlayer struct {
+type AudioPlayer struct {
 	Token					string	`json:"token"`
-	OffsetInMilliseconds	string	`json:"offsetInMilliseconds"`
+	OffsetInMilliseconds	uint64	`json:"offsetInMilliseconds"`
 	PlayerActivity			string	`json:"playerActivity"`
 }
 
-type request struct {
-	Type	string	`json:"type"`
-	Intent	intent	`json:"intent"`
+type Intent struct {
+	Name	string			`json:"name,omitempty"`
+	Slots	map[string]Slot	`json:"slots,omitempty"`
 }
 
-type intent struct {
-	Name	string			`json:"name"`
-	Slots	map[string]slot	`json:"slots"`
-}
-
-type slot struct {
+type Slot struct {
 	Name	string	`json:"name"`
-	Version	string	`json:"value"`
+	Value	string	`json:"value"`
 }
