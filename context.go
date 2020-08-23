@@ -31,7 +31,6 @@ type Context struct {
 type Params struct {
 	requestType	string
 	// session Data
-	new			bool
 
 	// Intent  Data
 	name		string
@@ -57,7 +56,6 @@ func parseRequest(req RequestBody) (params *Params) {
 	}
 	params = &Params{
 		requestType:	req.Request.Type,
-		new:			req.Session.New,
 		name:			intentName,
 		slots:			req.Request.Intent.Slots,
 	}
