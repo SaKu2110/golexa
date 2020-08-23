@@ -16,7 +16,7 @@ const(
 	CARD_TYPE_LINK_ACCOUNT = "LinkAccount"
 
 	// MESSAGE TYPE
-	MESSAGE_TYPE_TEXT = "Text"
+	MESSAGE_TYPE_TEXT = "PlainText"
 	MESSAGE_TYPE_SSML = "SSML"
 )
 
@@ -96,7 +96,7 @@ func (cx *Context) Ask()  *Context {
 }
 
 func (cx *Context) Tell() *Context {
-	cx.response.ShouldEndSession = false
+	cx.response.ShouldEndSession = true
 	return cx
 }
 
@@ -105,7 +105,7 @@ func (cx *Context) WithText(text string, params ...string) *Context {
 	if len(params) > 0 {
 		behavior = checkBehavior(params[0])
 	}
-	cx.response.OutputSpeech = setOutputSpeech("Text", text, behavior)
+	cx.response.OutputSpeech = setOutputSpeech("PlainText", text, behavior)
 	return cx
 }
 
@@ -124,7 +124,7 @@ func (cx *Context) RepromptWithText(text string, params ...string) *Context {
 		behavior = checkBehavior(params[0])
 	}
 	cx.response.Reprompt = &Reprompt{
-		OutputSpeech:	setOutputSpeech("Text", text, behavior),
+		OutputSpeech:	setOutputSpeech("PlainText", text, behavior),
 	}
 	return cx
 }
@@ -196,6 +196,7 @@ func (cx *Context) LinkAccountCard() *Context {
 	cx.response.Card = &Card{
 		Type:	CARD_TYPE_LINK_ACCOUNT,
 	}
+	return cx
 }
 
 /*********************/
