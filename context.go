@@ -24,13 +24,15 @@ type Context struct {
 	// request params
 	params		*Params
 
-	response	Response
+	attributes	map[string]interface{}
+	response	*Response
 	integrity	bool
 }
 
 type Params struct {
 	requestType	string
 	// session Data
+	attributes	map[string]interface{}
 
 	// Intent  Data
 	name		string
@@ -43,6 +45,7 @@ func GenContext(body []byte) (cx Context) {
 	
 	cx = Context{
 		params:		parseRequest(request),
+		attributes:	make(map[string]interface{}),
 		response:	makeNewResponse(),
 		integrity:	true,
 	}
@@ -54,23 +57,29 @@ func parseRequest(req RequestBody) (params *Params) {
 	if intentName == "IntentRequest" {
 		intentName = req.Request.Intent.Name
 	}
+	attributeMap := make(map[string]interface{})
+	if req.Session.Attributes != nil {
+		attributeMap = req.Session.Attributes
+	}
 	params = &Params{
 		requestType:	req.Request.Type,
+		attributes:		attributeMap,
 		name:			intentName,
 		slots:			req.Request.Intent.Slots,
 	}
 	return
 }
 
-func makeNewResponse() (res Response) {
-	res = Response{}
+func makeNewResponse() (res *Response) {
+	res = &Response{}
 	return
 }
 
 func (cx *Context) packData() (body *ResponseBody) {
 	body = &ResponseBody{
 		Version:	"1.0",
-		Response:	&cx.response,
+		Attributes:	cx.attributes,
+		Response:	cx.response,
 	}
 	return
 }
@@ -198,9 +207,27 @@ func (cx *Context) LinkAccountCard() *Context {
 }
 
 /*********************/
+/* Attribute Manager */
+/*********************/
+
+func (cx *Context) SetAttribute(key string, obj interface{}) *Context {
+	cx.attributes[key] = obj
+	return cx
+}
+
+func (cx *Context) CopyAttributes() *Context {
+	cx.attributes = cx.params.attributes
+	return cx
+}
+
+func (cx *Context) LoadAttribute(key string) interface{} {
+	return cx.params.attributes[key]
+}
+
+/*********************/
 /* Slot value getter */
 /*********************/
 
-func (cx *Context) SlotLoader(key string) string {
+func (cx *Context) LoadSlot(key string) string {
 	return cx.params.slots[key].Value
 }
