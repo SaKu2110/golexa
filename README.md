@@ -30,9 +30,9 @@ import(
 func main(){
   app := golexa.New()
   app.LaunchSession(LaunchRequest)
-	app.CustomIntent("SayHelloIntent", SayHelloIntent)
-	app.ClosedSession(SessionEndedRequest)
-	gin.Run()
+  app.CustomIntent("SayHelloIntent", SayHelloIntent)
+  app.ClosedSession(SessionEndedRequest)
+  gin.Run()
 }
 
 func LaunchRequest (c *golexa.Context) {
