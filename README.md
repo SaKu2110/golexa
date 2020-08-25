@@ -1,6 +1,5 @@
 # Golexa
 A Go package for interacting with Amazon Alexa.  
-Designed to work with Gin.
 
 An example application implementing the golexa can be played with [here](https://github.com/SaKu2110/golexa_example).
 ## Installation
@@ -8,7 +7,6 @@ To install Gin package, you need to install Go and set your Go workspace first.
 1. The first need Go installed (version 1.10+ is required), then you can use the below Go command to install Gin and Golexa.  
 
 ```sh
-$ go get github.com/gin-gonic/gin
 $ go get github.com/SaKu2110/golexa
 ```
 
@@ -16,7 +14,6 @@ $ go get github.com/SaKu2110/golexa
 
 ```go
 import(
-  "github.com/gin-gonic/gin"
   "github.com/SaKu2110/golexa"
 )
 ```
@@ -27,54 +24,81 @@ import(
 package main
 
 import(
-	"github.com/gin-gonic/gin"
 	"github.com/SaKu2110/golexa"
 )
 
 func main(){
-	gin := gin.Default()
-  
-	golexa := golexa.Default()
-	golexa.SetIntent(intent)
-
-	gin.POST("/", golexa.Handler)
+  app := golexa.New()
+  app.LaunchSession(LaunchRequest)
+	app.CustomIntent("SayHelloIntent", SayHelloIntent)
+	app.ClosedSession(SessionEndedRequest)
 	gin.Run()
 }
 
-func intent (c *golexa.Context) {
+func LaunchRequest (c *golexa.Context) {
+  // Your request processing
+}
+
+func SayHelloIntent (c *golexa.Context) {
+  // Your request processing
+}
+
+func SessionEndedRequest (c *golexa.Context) {
   // Your request processing
 }
 ```
 ### About 'Response'
-##### `Ask` and `Tell`
+#### `Ask` and `Tell`
 
 There are two kinds of responses you can send to Alexa: asks and tells. An ask should ask the user a question, and expect them to reply. A tell should end the conversation.
 ```go
-func intent (c *golexa.Context) {
-  switch c.Intent{
-  case "AskMoreIntent":
-    c.Ask("What next?")
-  case "FinishTalkIntent":
-    c.Tell("That's all.")
-  default:
-    c.Tell("There is no such intent.")
-  }
+func RequestHandler (c *golexa.Context) {
+  /* If you want to continue the conversation with this speech,
+   * you can use Ask().
+   * Json parameter: shouldEndSession = false
+   */
+  c.Ask().WithText("Hello World.")
+  /*  If you want to end the conversation with this utterance,
+   *  you can use Tell().
+   *  Json parameter: shouldEndSession = true
+   *  c.Tell()
+   */ 
 }
 ```
 
-##### `slots`
+#### `slots`
 
 Alexa sometimes has a programming language argument called slot.
 ```go
-func intent (c *golexa.Context) {
-  switch c.Intent{
-  case "EchoColorIntent":
-    // c.Slots("Slot Name")
-    c.Ask(c.Slots("color"))
-  default:
-    c.Tell("There is no such intent.")
-  }
+func RequestHandler (c *golexa.Context) {
+  // c.LoadSlot("Slot Name")
+  fmt.Printf("%s\n", c.LoadSlot("color"))
 }
 ```
+#### `attribute`
+Reading and setting session attributes.  
+
+You can persist data to an Alexa session:  
+```go
+func RequestHandler (c *golexa.Context) {
+  // Transcribe attributes to shouldEndSession.
+  c.CopyAttributes()
+}
+```
+You can read it:
+```go
+func RequestHandler (c *golexa.Context) {
+  // c.LoadAttribute("Attribute Key")
+  _ = c.LoadAttribute("episode")
+}
+```
+You cat regist new attribute:
+```go
+func RequestHandler (c *golexa.Context) {
+  // c.SetAttribute("Key", Value)
+  c.SetAttribute("episode", "one")
+}
+```
+
 ## License
 The package is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
